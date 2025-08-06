@@ -2,7 +2,9 @@ const { Router } = require('express');
 const adminRouter = Router();
 const { adminModel } = require("../db");
 const jwt = require("jsonwebtoken");
-const JWT_ADMIN_PASSWORD = "BLA@222";
+const { JWT_Admin_PASSWORD }  = require("../config");
+const { adminMiddleware } = require('../middleware/admin');
+
 
 adminRouter.post('/signup', async (req, res) => {
      const { email, password, firstName, lastName } = req.body; // Add zod validation
@@ -44,7 +46,19 @@ adminRouter.post('/signin', async (req, res) => {
     }
 })
 
-adminRouter.post('/course', (req, res) => {
+adminRouter.post('/course', adminMiddleware, async (req, res) => {
+    const adminId = req.userId;
+    const { title, description, imageUrl, price } = req.body;
+
+    // creating a web3 saas in 6 hours
+    const course = await courseModel.create({
+        title: title,
+        description: description,
+        imageUrl: imageUrl,
+        price: price,
+        creatorId: adminId
+    })
+
     res.json({
         message: "Course"
     })
